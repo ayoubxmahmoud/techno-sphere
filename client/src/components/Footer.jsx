@@ -4,17 +4,18 @@ import { Link } from "react-router-dom";
 
 const FooterPage = () => {
   return (
-    <Footer container className="border-t-8 border-teal-600">
+    <Footer container className="bg-indigo-950">
       <div className="w-full max-x-7xl mx-auto">
         <div className="grid w-full justify-between sm:flex md:grid-cols-1 sm:gap-4">
           <div className="grid grid-cols-1 gap-8 sm: mt-4 sm:grid-cols-3 sm:gap-6">
             <div>
-              <Footer.Title title="Company" />
+              <Footer.Title title="Company" className="text-white"/>
               <Footer.LinkGroup col>
                 <Footer.Link
                   href="/about"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="text-lg"
                 >
                   About Us
                 </Footer.Link>
@@ -26,8 +27,8 @@ const FooterPage = () => {
                 </Footer.Link>
               </Footer.LinkGroup>
             </div>
-            <div>
-              <Footer.Title title="Support" />
+            <div >
+              <Footer.Title title="Support" className="text-white" />
               <Footer.LinkGroup col>
                 <Footer.Link
                   href="/contact"
@@ -46,7 +47,7 @@ const FooterPage = () => {
               </Footer.LinkGroup>
             </div>
             <div className="text-gray-800">
-              <Footer.Title title="Newsletter" />
+              <Footer.Title title="Newsletter" className="text-white"/>
               <p className="mt-2 text-sm text-gray-600">
                 Sign up with your email to join our mailing list.
               </p>
