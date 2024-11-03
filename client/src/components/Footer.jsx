@@ -4,18 +4,17 @@ import { Link } from "react-router-dom";
 
 const FooterPage = () => {
   return (
-    <Footer container className="bg-indigo-950">
+    <Footer container className="border border-t-8 border-teal-950">
       <div className="w-full max-x-7xl mx-auto">
         <div className="grid w-full justify-between sm:flex md:grid-cols-1 sm:gap-4">
           <div className="grid grid-cols-1 gap-8 sm: mt-4 sm:grid-cols-3 sm:gap-6">
             <div>
-              <Footer.Title title="Company" className="text-white"/>
+              <Footer.Title title="Company" className="font-bold" />
               <Footer.LinkGroup col>
                 <Footer.Link
                   href="/about"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-lg"
                 >
                   About Us
                 </Footer.Link>
@@ -27,8 +26,8 @@ const FooterPage = () => {
                 </Footer.Link>
               </Footer.LinkGroup>
             </div>
-            <div >
-              <Footer.Title title="Support" className="text-white" />
+            <div>
+              <Footer.Title title="Support" className="font-bold" />
               <Footer.LinkGroup col>
                 <Footer.Link
                   href="/contact"
@@ -47,7 +46,7 @@ const FooterPage = () => {
               </Footer.LinkGroup>
             </div>
             <div className="text-gray-800">
-              <Footer.Title title="Newsletter" className="text-white"/>
+              <Footer.Title title="Newsletter" className="font-bold" />
               <p className="mt-2 text-sm text-gray-600">
                 Sign up with your email to join our mailing list.
               </p>
@@ -62,7 +61,10 @@ const FooterPage = () => {
                 </div>
 
                 <div className="flex items-center mt-2">
-                  <TextInput type="checkbox" className="w-4 h-4" />
+                  <input
+                    type="checkbox"
+                    className="rounded checked:bg-emerald-700"
+                  />{" "}
                   <p className="ml-4 text-sm text-gray-600">
                     I would like to receive emails from TechnoSphere
                   </p>
@@ -98,7 +100,7 @@ const FooterPage = () => {
           <div className="text-center">
             <Link
               to="/"
-              className="self-center whitespace-nowrap text-lg sm:text-xl font-semibold dark:text-white"
+              className="self-center whitespace-nowrap text-lg sm:text-xl font-semibold text-white"
             >
               <span className="px-2 py-1 bg-gradient-to-r from-green-500 via-emerald-500 to-green-300 text-white rounded-lg">
                 Techno
