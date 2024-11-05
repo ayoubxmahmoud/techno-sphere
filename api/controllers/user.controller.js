@@ -7,7 +7,8 @@ export const fetchUser = (req, res) => {
 }
 
 export const updateUser = async (req, res, next) => {
-
+    console.log(req.user.id);
+    
     if (req.user.id !== req.params.userId){
         return next(errorHandler(403, 'You are not allowed to update this user'));
     }
@@ -30,6 +31,7 @@ export const updateUser = async (req, res, next) => {
         if (!req.body.username.match(/^[a-zA-Z0-9]+$/)){
             return next(errorHandler(400, "Username can only contain letters and numbers"));
         }
+    }
         try {
             const updatedUser = await User.findByIdAndUpdate(req.params.userId, {
                 $set: {
@@ -44,6 +46,4 @@ export const updateUser = async (req, res, next) => {
         } catch (error) {
             next(error);
         }
-    }
-
 }

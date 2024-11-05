@@ -5,6 +5,9 @@ import imageCompression from "browser-image-compression";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useSelector } from "react-redux";
+import { updateStart, updateSuccess, updateFailure } from '../redux/user/userSlice';
+import { useDispatch} from 'react-redux';
+
 
 const DashProfile = () => {
   // Get the current user from the Redux store
@@ -15,12 +18,16 @@ const DashProfile = () => {
   // State to track whether an upload is in progress
   const [uploading, setUploading] = useState(false);
   // State to track the upload progress as a percentage
-  const [progress, setProgress] = useState(0); 
+  const [progress, setProgress] = useState(0);
   const [imageUploadError, setImageUploadError] = useState(null);
+  const [updateUserSuccess, setUpdateUserSuccess] = useState(null)
+  const [updateUserError, setUpdateUserError] = useState(null);
   // Reference to the hidden file input element
   const filePickerRef = useRef();
+  const dispatch = useDispatch();
+  
   const { theme } = useSelector((state) => state.theme);
-
+  const [formData, setFormData] = useState({});
   const handleImageChange = async (e) => {
     // Get the first file selected
     const file = e.target.files[0];
@@ -61,7 +68,7 @@ const DashProfile = () => {
     setProgress(0);
 
     const fileName = `${new Date().getTime()}-${imageFile.name}`;
-    const filePath = `users/${fileName}`;// Define a path in the storage bucket
+    const filePath = `users/${fileName}`; // Define a path in the storage bucket
 
     try {
       // Start a simulated upload process with progress updates
@@ -73,7 +80,7 @@ const DashProfile = () => {
       const { error } = await supabase.storage
         .from("techno-sphere")
         .upload(filePath, imageFile);
-      if (error){
+      if (error) {
         setImageUploadError(error.message);
         setImageFile(null);
         setImageFileUrl(null);
@@ -84,7 +91,10 @@ const DashProfile = () => {
       const { data: url } = supabase.storage
         .from("techno-sphere")
         .getPublicUrl(filePath);
-      setImageFileUrl(url.publicUrl); // Update the image URL for display
+      if (url) {
+        setImageFileUrl(url.publicUrl); // Update the image URL for display
+        setFormData({ ...formData, profilePicture: url.publicUrl });
+      }
     } catch (error) {
       setImageUploadError(error.message);
     } finally {
@@ -93,6 +103,45 @@ const DashProfile = () => {
     }
   };
 
+  const handleChange = (e) => {
+    setFormData({...formData, [e.target.id]: e.target.value});
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setUpdateUserError(null);
+    setUpdateUserSuccess(null)
+    if(Object.keys(formData).length === 0){
+      setUpdateUserError('No changes made')
+      return;
+    }
+    if (uploading){
+      setUpdateUserError('Please wait for image to upload...')
+      return;
+    }
+    try {
+      console.log("Form data being sent:", formData);
+      dispatch(updateStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if(!res.ok){
+        dispatch(updateFailure(data.message));
+        setUpdateUserError(data.message);
+      }else {
+        dispatch(updateSuccess(data));
+        setUpdateUserSuccess("User's profile updated successfully");
+      }
+    } catch (error) {
+      dispatch(updateFailure(error.message));
+      setUpdateUserSuccess(error.message)
+    }
+  }
   useEffect(() => {
     if (imageFile) {
       uploadImage();
@@ -102,7 +151,7 @@ const DashProfile = () => {
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
           type="file"
           accept="image/*"
@@ -147,21 +196,27 @@ const DashProfile = () => {
             }`}
           />
         </div>
-        {imageUploadError && <Alert color="failure">{imageUploadError}</Alert>}
-        {uploading && <Alert color="info">Uploading image...</Alert>}
+        {uploading && <Alert color="info">{"Please wait for image to upload..."}</Alert>}
         <TextInput
           type="text"
           id="username"
           placeholder="username"
           defaultValue={currentUser.username}
+          onChange={handleChange}
         />
         <TextInput
           type="email"
           id="email"
           placeholder="email"
           defaultValue={currentUser.email}
+          onChange={handleChange}
         />
-        <TextInput type="password" id="password" placeholder="password" />
+        <TextInput
+          type="password"
+          id="password"
+          placeholder="password"
+          onChange={handleChange}
+        />
         <Button type="submit" gradientDuoTone="greenToBlue" outline>
           Update
         </Button>
@@ -170,8 +225,20 @@ const DashProfile = () => {
         <span className="cursor-pointer">Delete Account</span>
         <span className="cursor-pointer">Sign Out</span>
       </div>
+      {updateUserSuccess && (
+        <Alert color="success" className="mt-5">
+          {updateUserSuccess}
+        </Alert>
+      )}
+      
+      {updateUserError && (
+        <Alert color="failure" className="mt-5">
+          {updateUserError}
+        </Alert>
+      )}
     </div>
   );
 };
 
 export default DashProfile;
+
