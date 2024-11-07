@@ -16,15 +16,17 @@ import {
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { Link } from "react-router-dom";
+
 
 const DashProfile = () => {
   // Get the current user from the Redux store
-  const { currentUser, error } = useSelector((state) => state.user);
+  const { currentUser, error, loading } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   // State to hold the image URL for preview
   const [imageFileUrl, setImageFileUrl] = useState(null);
   // State to track whether an upload is in progress
-  const [uploading, setUploading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   // State to track the upload progress as a percentage
   const [progress, setProgress] = useState(0);
   const [imageUploadError, setImageUploadError] = useState(null);
@@ -73,7 +75,7 @@ const DashProfile = () => {
 
   // Function to handle image upload to Supabase
   const uploadImage = async () => {
-    setUploading(true);
+    setUploadingImage(true);
     setProgress(0);
 
     const fileName = `${new Date().getTime()}-${imageFile.name}`;
@@ -107,7 +109,7 @@ const DashProfile = () => {
     } catch (error) {
       setImageUploadError(error.message);
     } finally {
-      setUploading(false); // Reset uploading state
+      setUploadingImage(false); // Reset uploadingImage state
       setProgress(100); // Complete the progress bar
     }
   };
@@ -124,7 +126,7 @@ const DashProfile = () => {
       setUpdateUserError("No changes made");
       return;
     }
-    if (uploading) {
+    if (uploadingImage) {
       setUpdateUserError("Please wait for image to upload...");
       return;
     }
@@ -207,7 +209,7 @@ const DashProfile = () => {
           className="relative w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full"
           onClick={() => filePickerRef.current.click()}
         >
-          {uploading && (
+          {uploadingImage && (
             <CircularProgressbar
               value={progress}
               text={`${progress}%`}
@@ -234,11 +236,11 @@ const DashProfile = () => {
             src={imageFileUrl || currentUser.profilePicture}
             alt="user"
             className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${
-              uploading ? "blur-sm opacity-50" : ""
+              uploadingImage ? "blur-sm opacity-50" : ""
             }`}
           />
         </div>
-        {uploading && (
+        {uploadingImage && (
           <Alert color="info">{"Please wait for image to upload..."}</Alert>
         )}
         <TextInput
@@ -261,9 +263,19 @@ const DashProfile = () => {
           placeholder="password"
           onChange={handleChange}
         />
-        <Button type="submit" gradientDuoTone="greenToBlue" outline>
-          Update
+        <Button type="submit" gradientDuoTone="greenToBlue" outline disabled={loading || uploadingImage}>
+          { loading ? "Loading..." : "Update"}
         </Button>
+        { currentUser.isAdmin && (
+          <Link to={'/create-post'}>
+            <Button 
+              type="button"
+              gradientDuoTone="purpleToBlue"
+              className="w-full">
+                Create a post
+              </Button>
+          </Link>
+        )}
       </form>
       <div className="text-red-500 flex justify-between mt-5">
         <span onClick={() => setShowModal(true)} className="cursor-pointer">
