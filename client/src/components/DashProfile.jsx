@@ -83,7 +83,7 @@ const DashProfile = () => {
 
     try {
       // Start a simulated upload process with progress updates
-      for (let i = 1; i <= 100; i += 10) {
+      for (let i = 0; i <= 100; i += 10) {
         setTimeout(() => setProgress(i), i * 100);
       }
 
@@ -104,7 +104,7 @@ const DashProfile = () => {
         .getPublicUrl(filePath);
       if (url) {
         setImageFileUrl(url.publicUrl); // Update the image URL for display
-        setFormData({ ...formData, profilePicture: url.publicUrl });
+        setFormData({ ...formData, profilePicture: url.publicUrl }); // Update the formData to include the image URL for profile picture
       }
     } catch (error) {
       setImageUploadError(error.message);
@@ -122,6 +122,7 @@ const DashProfile = () => {
     e.preventDefault();
     setUpdateUserError(null);
     setUpdateUserSuccess(null);
+    
     if (Object.keys(formData).length === 0) {
       setUpdateUserError("No changes made");
       return;
@@ -131,7 +132,6 @@ const DashProfile = () => {
       return;
     }
     try {
-      console.log("Form data being sent:", formData);
       dispatch(updateStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
         method: "PUT",
@@ -150,7 +150,7 @@ const DashProfile = () => {
       }
     } catch (error) {
       dispatch(updateFailure(error.message));
-      setUpdateUserSuccess(error.message);
+      setUpdateUserError(error.message);
     }
   };
   useEffect(() => {
