@@ -1,17 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 import { Alert, Button, FileInput, Select, TextInput } from "flowbite-react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { supabase } from "../supabase";
-import {
-  createPostSuccess,
-  createPostStart,
-  createPostFailure,
-} from "../redux/post/postSlice";
+
 import imageCompression from "browser-image-compression";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
   const [postData, setPostData] = useState({});
@@ -19,12 +17,31 @@ const CreatePost = () => {
   const [imageUrl, setImageUrl] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageUploadError, setImageUploadError] = useState(null);
-  const [postCreated, setPostCreated] = useState(null);
-  const { currentPost, error, loading } = useSelector((state) => state.post);
   const { theme } = useSelector((state) => state.theme);
+  const [publishError, setPublishError] = useState(null);
 
-  const dispatch = useDispatch();
   const [progress, setProgress] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/check-token", {
+          credentials: "include",
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        });
+        if (response.status === 401) {
+          navigate("/sign-in");
+        }
+      } catch (error) {
+        console.error("Authentication check failed: ", error);
+        navigate("/sign-in");
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
   // Handle input changes for text and select inputs
   const handleChange = (e) => {
@@ -113,19 +130,7 @@ const CreatePost = () => {
   const handleSubmitPost = async (e) => {
     e.preventDefault();
 
-    if (Object.keys(postData).length === 0) {
-      dispatch(createPostFailure("No changes made"));
-      return;
-    }
-
-    if (uploadingImage) {
-      dispatch(createPostFailure("Please wait for image to upload..."));
-      return;
-    }
-
     try {
-      dispatch(createPostStart());
-
       const res = await fetch("/api/post/create", {
         method: "POST",
         headers: {
@@ -136,14 +141,15 @@ const CreatePost = () => {
       });
 
       const data = await res.json();
+
       if (res.ok) {
-        dispatch(createPostSuccess(data));
-        setPostCreated("The post has been created successfully");
+        setPublishError(null);
+        navigate(`/post/${data.slug}`);
       } else {
-        dispatch(createPostFailure(data.message));
+        setPublishError(data.message);
       }
     } catch (error) {
-      dispatch(createPostFailure(error.message));
+      setPublishError(error.message);
     }
   };
 
@@ -234,26 +240,20 @@ const CreatePost = () => {
           theme="snow"
           placeholder="Write something..."
           className="h-72 mb-12"
-          id="content"
           required
           onChange={(content) => setPostData({ ...postData, content })} // Update content in postData
         />
         <Button
           type="submit"
           gradientDuoTone="purpleToPink"
-          disabled={uploadingImage || loading}
+          disabled={uploadingImage}
         >
-          {loading ? "Loading..." : "Publish"}
+          Publish
         </Button>
       </form>
-      {postCreated && (
-        <Alert color="success" className="mt-5">
-          {postCreated}
-        </Alert>
-      )}
-      {error && (
+      {publishError && (
         <Alert color="failure" className="mt-5">
-          {error}
+          {publishError}
         </Alert>
       )}
     </div>

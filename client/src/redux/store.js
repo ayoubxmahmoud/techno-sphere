@@ -1,6 +1,5 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import userReducer from './user/userSlice';
-import postReducer from './post/postSlice';
 import themeReducer from './theme/themeSlice'
 import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
@@ -9,7 +8,6 @@ import persistStore from 'redux-persist/es/persistStore'
 // Combine the 'user','post' and 'theme' reducers into a root reducer
 const rootReducer = combineReducers({
   user: userReducer, // Assign user slice to 'user' key in the Redux state
-  post: postReducer,
   theme: themeReducer // Assign theme slice to 'theme' key in the Redux state
 });
 

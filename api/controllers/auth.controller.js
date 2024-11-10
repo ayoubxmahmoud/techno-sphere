@@ -81,3 +81,12 @@ export const google = async (req, res, next) => {
     next(error)
   }
 }
+
+export const checkToken = async (req, res) => {
+  // Extract token from the HttpOnly cookie
+  const token = req.cookies.access_token;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized: No token provided'} );
+  }
+}
