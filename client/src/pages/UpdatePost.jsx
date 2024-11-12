@@ -8,15 +8,16 @@ import { supabase } from "../supabase";
 import imageCompression from "browser-image-compression";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const CreatePost = () => {
+const UpdatePost = () => {
   const [postData, setPostData] = useState({
     title: "",
     category: "",
     content: "",
-    image: ""
-  });  const [fileImage, setFileImage] = useState(null);
+    image: "",
+  });
+  const [fileImage, setFileImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageUploadError, setImageUploadError] = useState(null);
@@ -25,6 +26,8 @@ const CreatePost = () => {
 
   const [progress, setProgress] = useState(0);
   const navigate = useNavigate();
+  const { postId } = useParams();
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -44,7 +47,22 @@ const CreatePost = () => {
       }
     };
     checkAuth();
-  }, [navigate]);
+
+    const fetchPost = async () => {
+      const res = await fetch(`/api/post/getposts?postId=${postId}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.log(data.message);
+        setPublishError(data.message);
+        return;
+      } else {
+        setPublishError(null);
+        setPostData(data.posts[0]);
+      }
+    };
+    fetchPost();
+  }, [postId, navigate]);
 
   // Handle input changes for text and select inputs
   const handleChange = (e) => {
@@ -134,14 +152,17 @@ const CreatePost = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch("/api/post/create", {
-        method: "POST",
-        headers: {
-          // Corrected to "headers"
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(postData),
-      });
+      const res = await fetch(
+        `/api/post/update/${currentUser._id}/${postData._id}`,
+        {
+          method: "PUT",
+          headers: {
+            // Corrected to "headers"
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postData),
+        }
+      );
 
       const data = await res.json();
 
@@ -158,7 +179,7 @@ const CreatePost = () => {
 
   return (
     <div className="p-3 max-w-3xl mx-auto min-h-screen">
-      <h1 className="text-center text-3xl my-7 font-semibold">Create a post</h1>
+      <h1 className="text-center text-3xl my-7 font-semibold">Update post</h1>
       <form className="flex flex-col gap-4" onSubmit={handleSubmitPost}>
         <div className="flex flex-col gap-4 sm:flex-row justify-between">
           <TextInput
@@ -168,8 +189,13 @@ const CreatePost = () => {
             id="title"
             className="flex-1"
             onChange={handleChange}
+            value={postData.title || ""}
           />
-          <Select onChange={handleChange} id="category">
+          <Select
+            onChange={handleChange}
+            id="category"
+            value={postData.category || ""}
+          >
             <option value="javascript">Javascript</option>
             <option value="react">React</option>
             <option value="nodejs">Node Js</option>
@@ -234,7 +260,7 @@ const CreatePost = () => {
         )}
         {postData.image && (
           <img
-            src={postData.image}
+            src={postData.image || ""}
             alt="post-image"
             className="w-full h-72 object-cover"
           />
@@ -245,13 +271,14 @@ const CreatePost = () => {
           className="h-72 mb-12"
           required
           onChange={(content) => setPostData({ ...postData, content })} // Update content in postData
+          value={postData.content || ""}
         />
         <Button
           type="submit"
           gradientDuoTone="purpleToPink"
           disabled={uploadingImage}
         >
-          Publish
+          Update post
         </Button>
       </form>
       {publishError && (
@@ -263,4 +290,4 @@ const CreatePost = () => {
   );
 };
 
-export default CreatePost;
+export default UpdatePost;
