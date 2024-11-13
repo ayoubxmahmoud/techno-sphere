@@ -29,18 +29,21 @@ const DashUsers = () => {
     }
   };
   const handleDeleteUser = async () => {
-    setShowModal(false);
 
     try {
-      const res = await fetch(`/api/user/delete/userId=${userIdToDelete}`, {
+      const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
         method: "DELETE",
       });
 
       if (res.ok) {
         setDeleteUserSuccess(res.message);
+        setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
+        setShowModal(false);
+      }else {
+        console.log(data.message);
       }
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
     }
   };
   useEffect(() => {
