@@ -17,7 +17,6 @@ import {
 import { useDispatch } from "react-redux";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
 const DashProfile = () => {
   // Get the current user from the Redux store
@@ -38,7 +37,6 @@ const DashProfile = () => {
   const { theme } = useSelector((state) => state.theme);
   const [formData, setFormData] = useState({});
   const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
 
   const handleImageChange = async (e) => {
     // Get the first file selected
@@ -155,28 +153,10 @@ const DashProfile = () => {
     }
   };
   useEffect(() => {
-
-    const checkAuth = async () => {
-      try {
-        const response = await fetch("/api/auth/check-token", {
-          credentials: "include",
-          headers: {
-            "Cache-Control": "no-cache",
-          },
-        });
-        if (response.status === 401) {
-          navigate("/sign-in");
-        }
-      } catch (error) {
-        console.error("Authentication check failed: ", error);
-        navigate("/sign-in");
-      }
-    };
-    checkAuth();
     if (imageFile) {
       uploadImage();
     }
-  }, [imageFile, navigate]);
+  }, [imageFile]);
 
   const handleDeleteUser = async () => {
     setShowModal(false);

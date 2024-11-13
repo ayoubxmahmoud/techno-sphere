@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button, Modal, Table } from "flowbite-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
-import { useNavigate } from "react-router-dom";
 
 const DashPosts = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -11,11 +10,10 @@ const DashPosts = () => {
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [postIdToDelete, setPostIdToDelete] = useState("");
-  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleShowMore = async () => {
     const startIndex = userPosts.length;
-    console.log(startIndex);
     try {
       const res = await fetch(
         `/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`
@@ -31,6 +29,7 @@ const DashPosts = () => {
       console.log(error.message);
     }
   };
+
   const handleDeletePost = async () => {
     setShowModal(false);
 
@@ -41,7 +40,7 @@ const DashPosts = () => {
           method: "DELETE",
         }
       );
-      const data = res.json();
+      const data = await res.json(); // Awaiting `res.json()` here
       if (!res.ok) {
         console.log(data.message);
       } else {
@@ -53,30 +52,13 @@ const DashPosts = () => {
       console.log(error.message);
     }
   };
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch("/api/auth/check-token", {
-          credentials: "include",
-          headers: {
-            "Cache-Control": "no-cache",
-          },
-        });
-        if (response.status === 401) {
-          navigate("/sign-in");
-        }
-      } catch (error) {
-        console.error("Authentication check failed: ", error);
-        navigate("/sign-in");
-      }
-    };
-    checkAuth();
 
+  useEffect(() => {
     const fetchPosts = async () => {
       try {
+        setShowMore(true); // Resetting showMore on each fetch
         const res = await fetch(`/api/post/getposts?userId=${currentUser._id}`);
         const data = await res.json();
-
         if (res.ok) {
           setUserPosts(data.posts);
           if (data.posts.length < 9) {
@@ -87,10 +69,11 @@ const DashPosts = () => {
         console.log(error.message);
       }
     };
+
     if (currentUser.isAdmin) {
       fetchPosts();
     }
-  }, [currentUser._id, navigate]);
+  }, [currentUser, location.search]); // Adding `location.search` as a dependency
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-700">
@@ -108,7 +91,7 @@ const DashPosts = () => {
               </Table.HeadCell>
             </Table.Head>
             {userPosts.map((post) => (
-              <Table.Body className="divide-y">
+              <Table.Body className="divide-y" key={post._id}>
                 <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell>
                     {new Date(post.updatedAt).toLocaleDateString()}
