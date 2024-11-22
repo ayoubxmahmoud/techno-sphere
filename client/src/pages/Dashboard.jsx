@@ -7,6 +7,7 @@ import DashUsers from "../components/DashUsers";
 import { useDispatch } from "react-redux";
 import { signOutSuccess } from "../redux/user/userSlice";
 import DashComments from "../components/DashComments";
+import DashboardComp from "../components/DashboardComp";
 
 const Dashboard = () => {
   const location = useLocation();
@@ -60,6 +61,8 @@ const Dashboard = () => {
         {tab === "posts" && <DashPosts />}
         {tab === "users" && <DashUsers />}
         {tab === "comments" && <DashComments />}
+        {tab === "dash" && <DashboardComp />}
+
       </>
     </div>
   );

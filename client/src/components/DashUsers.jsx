@@ -19,8 +19,8 @@ const DashUsers = () => {
       const res = await fetch(`/api/user/get-users?startIndex=${startIndex}`);
       const data = await res.json();
       if (res.ok) {
-        setUsers((prev) => [...prev, ...data.usersWithoutPassword]);
-        if (data.usersWithoutPassword.length < 9) {
+        setUsers((prev) => [...prev, ...data.users]);
+        if (data.users.length < 9) {
           setShowMore(false);
         }
       }
@@ -53,8 +53,8 @@ const DashUsers = () => {
         const data = await res.json();
 
         if (res.ok) {
-          setUsers(data.usersWithoutPassword);
-          if (data.usersWithoutPassword.length < 9) {
+          setUsers(data.users);
+          if (data.users.length < 9) {
             setShowMore(false);
           }
         }
