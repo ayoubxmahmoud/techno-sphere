@@ -28,7 +28,8 @@ const UpdatePost = () => {
   const navigate = useNavigate();
   const { postId } = useParams();
   const { currentUser } = useSelector((state) => state.user);
-
+  console.log(postData);
+  
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -49,7 +50,7 @@ const UpdatePost = () => {
     checkAuth();
 
     const fetchPost = async () => {
-      const res = await fetch(`/api/post/getposts?postId=${postId}`);
+      const res = await fetch(`/api/post/get-posts?postId=${postId}`);
       const data = await res.json();
 
       if (!res.ok) {
@@ -153,7 +154,7 @@ const UpdatePost = () => {
 
     try {
       const res = await fetch(
-        `/api/post/update/${currentUser._id}/${postData._id}`,
+        `/api/post/update/${currentUser._id}/${postId}`,
         {
           method: "PUT",
           headers: {

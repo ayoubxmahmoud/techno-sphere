@@ -1,17 +1,29 @@
 import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
 import { signOutSuccess } from "../redux/user/userSlice";
-
 const Header = () => {
   const path = useLocation().pathname;
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const { theme } = useSelector((state) => state.theme);
+  const [searchTerm, setSearchTerm] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
+  console.log(searchTerm);
+  
+
+  useEffect(() => {    
+    const urlParams = new URLSearchParams(location.search);
+    const searchTermFromUrl = urlParams.get('searchTerm');
+    if(searchTermFromUrl) {
+      setSearchTerm(searchTermFromUrl);
+    }
+  }, [location.search])
 
   const handleSignOut = async () => {
     try {
@@ -28,7 +40,18 @@ const Header = () => {
       console.log(error.message);
     }
   };
-
+  const handleSubmit = (e) => {
+    // Prevent the default form for submition behavior to aviod page reload
+    e.preventDefault();
+    // Create a news URLSearchParams object based on the current location's search query string
+    const urlParams = new URLSearchParams(location.search);
+    // Update the searchTerm parameter in URLSearchTerm object with the current searchTerm value
+    urlParams.set('searchTerm', searchTerm);
+    // Convert the URLSearchParams object to a string to form the query string
+    const searchQuery = urlParams.toString();
+    // Navigate to Search page with the updated query string in URL
+    navigate(`/search?${searchQuery}`);
+  }
   return (
     <Navbar className="border-b-2 border-teal-950">
       <Link
@@ -40,13 +63,15 @@ const Header = () => {
         </span>
         Sphere
       </Link>
-      <form>
+      <form onSubmit={handleSubmit}>
         <TextInput
           type="text"
           placeholder="Search..."
           rightIcon={AiOutlineSearch}
           className="hidden lg:inline"
-        ></TextInput>
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </form>
       <Button className="w-12 h-10 lg:hidden pt-1" color="gray" pill>
         <AiOutlineSearch />
