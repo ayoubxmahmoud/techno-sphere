@@ -17,7 +17,7 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  users: {
+  candidates: {
     type: [String], // Array of job requirements
   },
   createdAt: {
