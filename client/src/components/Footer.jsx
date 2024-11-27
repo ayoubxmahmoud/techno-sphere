@@ -1,27 +1,81 @@
 import { Button, Footer, Label, TextInput } from "flowbite-react";
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const FooterPage = () => {
+  const [email, setEmail] = useState("");
+  const [isChecked, setIsChecked] = useState(false);
+  const handleSubscription = async (e) => {
+    e.preventDefault();
+
+    if (!email && !isChecked) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/subscribe/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        Swal.fire({
+          title: "Subscription Successful!",
+          text: "Thank you for subscribing to our newsletter!",
+          icon: "success",
+          confirmButtonText: "Awesome",
+        });
+        setEmail(""); // Clear the email input
+        setIsChecked(false); // Reset the checkbox
+      } else {
+        Swal.fire({
+          title: "Subscription Failed",
+          text: "There was an issue with your subscription. Please try again.",
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+      }
+    } catch (error) {
+      console.error("Error subscribing to newsletter:", error);
+      Swal.fire({
+        title: "Error",
+        text: "An error occurred. Please try again later.",
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
+    }
+  };
+
   return (
     <Footer container className="border border-t-8 border-teal-950">
       <div className="w-full max-x-7xl mx-auto">
-        <div className="grid w-full justify-between sm:flex md:grid-cols-1 sm:gap-4">
-          <div className="grid grid-cols-1 gap-8 sm: mt-4 sm:grid-cols-3 sm:gap-6">
+        <div className="grid w-full justify-between sm:flex md:grid-cols-1 sm:gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:mt-4 sm:grid-cols-4 sm:gap-2">
             <div>
-              <Footer.Title title="Company" className="font-bold" />
+              <Footer.Title title="Company"/>
               <Footer.LinkGroup col>
                 <Footer.Link
                   href="/about"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="text-gray-400"
                 >
                   About Us
                 </Footer.Link>
-                <Footer.Link href="#" target="_blank" rel="noopener noreferrer">
+                <Footer.Link
+                  href="/projects"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400"
+                >
+                  Projects
+                </Footer.Link>
+                <Footer.Link href="/careers" target="_blank" rel="noopener noreferrer" className="text-gray-400">
                   Careers
                 </Footer.Link>
-                <Footer.Link href="#" target="_blank" rel="noopener noreferrer">
+                <Footer.Link href="#" target="_blank" rel="noopener noreferrer" className="text-gray-400">
                   Resources
                 </Footer.Link>
               </Footer.LinkGroup>
@@ -33,6 +87,7 @@ const FooterPage = () => {
                   href="/contact"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="text-gray-400"
                 >
                   Contact
                 </Footer.Link>
@@ -40,8 +95,38 @@ const FooterPage = () => {
                   href="/help-center"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="text-gray-400"
                 >
                   Help Center
+                </Footer.Link>
+              </Footer.LinkGroup>
+            </div>
+            <div>
+              <Footer.Title title="Community" className="font-bold"/>
+              <Footer.LinkGroup col>
+                <Footer.Link
+                  href="/guides"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400"
+                >
+                  Guides
+                </Footer.Link>
+                <Footer.Link
+                  href="/teach"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400"
+                >
+                  Teach
+                </Footer.Link>
+                <Footer.Link
+                  href="/affiliate"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400"
+                >
+                  Affiliate Partners
                 </Footer.Link>
               </Footer.LinkGroup>
             </div>
@@ -50,26 +135,34 @@ const FooterPage = () => {
               <p className="mt-2 text-sm text-gray-600">
                 Sign up with your email to join our mailing list.
               </p>
-              <form className="mt-4 space-y-4">
+              <form className="mt-4 space-y-4" onSubmit={handleSubscription}>
                 <div>
                   <Label value="Email Address:" required />
                   <TextInput
                     type="email"
                     placeholder="Enter your email"
                     className="mt-1 w-full"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
                   />
                 </div>
-
-                <div className="flex items-center mt-2">
-                  <input
-                    type="checkbox"
-                    className="rounded checked:bg-emerald-700"
-                  />{" "}
-                  <p className="ml-4 text-sm text-gray-600">
-                    I would like to receive emails from TechnoSphere
-                  </p>
+                <div className="flex items-start flex-col sm:flex-row mt-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      className="rounded checked:bg-emerald-700"
+                      id="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => setIsChecked(e.target.checked)}
+                      required
+                    />
+                    <p className="ml-4 text-sm text-gray-600">
+                      I would like to receive emails from TechnoSphere
+                    </p>
+                  </div>
                 </div>
-
                 <Button
                   type="submit"
                   className="bg-emerald-700 hover:bg-emerald-800 text-white w-full mt-4"
@@ -78,6 +171,7 @@ const FooterPage = () => {
                   Submit
                 </Button>
               </form>
+
               <div className="flex space-x-4 mt-6 text-gray-500">
                 {["twitter", "facebook-f", "youtube", "linkedin-in"].map(
                   (icon, index) => (
