@@ -3,31 +3,54 @@
 @tailwind utilities;
 
 body {
-    height: 100v;
+  height: 100v;
 }
 
 .ql-editor {
-    font-size: 1.05rem;
+  font-size: 1.05rem;
 }
-.post-content p{
-    margin-bottom: 0.5rem;
+.post-content p {
+  margin-bottom: 0.5rem;
 }
 .post-content h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    font-family: sans-serif;
-    margin: 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: sans-serif;
+  margin: 1.5rem 0;
 }
 .post-content h2 {
-    font-size: 1.4rem;
-    font-family: sans-serif;
-    margin: 1.5rem 0;
+  font-size: 1.4rem;
+  font-family: sans-serif;
+  margin: 1.5rem 0;
 }
 .post-content a {
-    color: rgb(73, 149, 199);
-    text-decoration: none;  
+  color: rgb(73, 149, 199);
+  text-decoration: none;
 }
 
 .post-content a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
+
+.project-card-view {
+  box-shadow: 0 4px 5px 3px rgba(119, 53, 136, 0.459) !important;
+  background-color: transparent !important;
+  opacity: 0.9 !important;
+  transition: all 0.5s ease 0s !important;
+  height: 100% !important;
+}
+.project-card-view:hover {
+  transform: scale(1.02) !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 4px 5px rgba(129, 72, 144, 0.561) !important;
+}
+
+.ql-editor {
+  color: #374151; /* Default text color for light mode */
+}
+
+/* Dark mode styles */
+.dark .ql-editor {
+  color: #f3f4f6; /* Text color for dark mode */
+}
+
