@@ -8,6 +8,7 @@ import {
   HiOutlineUserGroup,
   HiAnnotation,
   HiChartPie,
+  HiOutlineBriefcase
 } from "react-icons/hi";
 import { signOutSuccess } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
@@ -46,9 +47,8 @@ const DashSidebar = () => {
     <Sidebar className="w-full md:w-56">
       <Sidebar.Items>
         <Sidebar.ItemGroup className="flex flex-col gap-1">
-          {
-            currentUser && currentUser.isAdmin && (
-              <Link to="/dashboard?tab=dash">
+          {currentUser && currentUser.isAdmin && (
+            <Link to="/dashboard?tab=dash">
               <Sidebar.Item
                 active={tab === "dash" || !tab}
                 icon={HiChartPie}
@@ -57,8 +57,7 @@ const DashSidebar = () => {
                 Dashboard
               </Sidebar.Item>
             </Link>
-            )
-          }
+          )}
           <Link to="/dashboard?tab=profile">
             <Sidebar.Item
               active={tab === "profile"}
@@ -101,6 +100,15 @@ const DashSidebar = () => {
                   as="div"
                 >
                   Comments
+                </Sidebar.Item>
+              </Link>
+              <Link to="/dashboard?tab=jobs">
+                <Sidebar.Item
+                  active={tab === "jobs"}
+                  icon={HiOutlineBriefcase}
+                  as="div"
+                >
+                  Jobs
                 </Sidebar.Item>
               </Link>
             </>

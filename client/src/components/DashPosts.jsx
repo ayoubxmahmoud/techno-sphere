@@ -57,7 +57,9 @@ const DashPosts = () => {
     const fetchPosts = async () => {
       try {
         setShowMore(true); // Resetting showMore on each fetch
-        const res = await fetch(`/api/post/get-posts?userId=${currentUser._id}`);
+        const res = await fetch(
+          `/api/post/get-posts?userId=${currentUser._id}`
+        );
         const data = await res.json();
         if (res.ok) {
           setUserPosts(data.posts);
@@ -76,7 +78,7 @@ const DashPosts = () => {
   }, [currentUser, location.search]); // Adding `location.search` as a dependency
 
   return (
-    <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-700">
+    <div className="table-auto p-6 scrollbar  scrollbar-track-slate-700 scrollbar-thumb-slate-700 overflow-x-scroll md:overflow-x-auto">
       {currentUser.isAdmin && userPosts.length > 0 ? (
         <>
           <Table hoverable className="shadow-md">
